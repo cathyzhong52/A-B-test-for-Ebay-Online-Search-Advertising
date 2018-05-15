@@ -1,36 +1,56 @@
-# History files
-.Rhistory
-.Rapp.history
+library(readr)
+Homework_1_Data_436R <- read.csv(file.choose())
 
-# Session Data files
-.RData
+#b)
+date <- Homework_1_Data_436R$date
+dma <- Homework_1_Data_436R$dma
+isTreatmentPeriod <- Homework_1_Data_436R$isTreatmentPeriod
+isTreatmentGroup <- Homework_1_Data_436R$isTreatmentGroup
+revenue <- Homework_1_Data_436R$revenue
 
-# Example code in package build process
-*-Ex.R
+paste(date)
+as.Date(date, "%m/%d/%Y")
+typeof(date)
 
-# Output files from R CMD build
-/*.tar.gz
+#c)
+StartDate <- date[which(isTreatmentPeriod == 1)][1]
+StartDate
 
-# Output files from R CMD check
-/*.Rcheck/
+#d)
+#i.
+TreatmentGroup <- subset(Homework_1_Data_436R, isTreatmentGroup == 1)
+TreatmentGroup
 
-# RStudio files
-.Rproj.user/
+#ii.
+TreatmentRevenue <- lm(log(revenue)~isTreatmentPeriod, data=TreatmentGroup)
 
-# produced vignettes
-vignettes/*.html
-vignettes/*.pdf
+#iii.
+summary(TreatmentRevenue)
 
-# OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
-.httr-oauth
+#e)
+#i.
+PrePeriod <- subset(Homework_1_Data_436R, isTreatmentPeriod == 0)
+PrePeriod
 
-# knitr and R markdown default cache directories
-/*_cache/
-/cache/
+#ii.
+PrePeriodRevenue <- lm(log(revenue)~isTreatmentGroup, data = PrePeriod)
 
-# Temporary files created by R markdown
-*.utf8.md
-*.knit.md
+#iii.
+summary(PrePeriodRevenue)
 
-# Shiny token, see https://shiny.rstudio.com/articles/shinyapps.html
-rsconnect/
+#f)
+PostPeriod <- subset(Homework_1_Data_436R, isTreatmentPeriod == 1)
+PostPeriod
+
+PostPeriodRevenue <- lm(log(revenue)~isTreatmentGroup, data = PostPeriod)
+summary(PostPeriodRevenue)
+
+#g)
+library(lubridate)
+month <- month(as.POSIXlt(PostPeriod$date, format="%m/%d/%Y"))
+month
+month <- as.data.frame(month)
+PostPeriod <- cbind(PostPeriod, month)
+MonthRevenue <- lm(log(revenue)~month+isTreatmentGroup, data = PostPeriod)
+summary(MonthRevenue)
+
